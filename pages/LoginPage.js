@@ -1,25 +1,34 @@
 import {BasePage} from "./BasePage";
+import {expect} from "@playwright/test";
 
+const SELECTORS = {
+    usernameField: 'input[name="username"]',
+    passwordField: 'input[name="password"]',
+    loginButton: 'button[type="submit"]',
+    logo: 'company-branding',
+    errorAlert: "[role='alert'] > div > p",
+    requiredError: ".oxd-form-row > div > span"
+};
 
 export class LoginPage extends BasePage {
 
-    constructor(page, expect) {
-        super(page, expect);
-        this.usernameField = this.page.locator('input[name="username"]');
-        this.passwordField = this.page.locator('input[name="password"]');
-        this.loginButton = this.page.locator('button[type="submit"]');
+    constructor(page) {
+        super(page);
+        this.usernameField = this.page.locator(SELECTORS.usernameField);
+        this.passwordField = this.page.locator(SELECTORS.passwordField);
+        this.loginButton = this.page.locator(SELECTORS.loginButton);
     }
 
     async openLoginPage() {
-        await this.page.goto(this.getLoginUrl());
-        const logo = this.page.getByAltText('company-branding');
-        await this.expect(logo).toBeVisible();
+        await this.page.goto(this.getPageUrl('loginPageUrl'));
+        const logo = this.page.getByAltText(SELECTORS.logo);
+        await expect(logo).toBeVisible();
     }
 
     async verifyLoginPageElementsAreDisplaying() {
-        await this.expect(this.usernameField).toBeVisible();
-        await this.expect(this.passwordField).toBeVisible();
-        await this.expect(this.loginButton).toBeVisible();
+        await expect(this.usernameField).toBeVisible();
+        await expect(this.passwordField).toBeVisible();
+        await expect(this.loginButton).toBeVisible();
     }
 
     async loginWithCredentials(username, password) {
@@ -29,11 +38,11 @@ export class LoginPage extends BasePage {
     }
 
     getErrorAlertLocator() {
-        return this.page.locator("[role='alert'] > div > p");
+        return this.page.locator(SELECTORS.errorAlert);
     }
 
     getRequiredErrorLocator(){
-        return this.page.locator(".oxd-form-row > div > span");
+        return this.page.locator(SELECTORS.requiredError);
     }
 }
 

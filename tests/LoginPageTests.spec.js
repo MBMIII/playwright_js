@@ -1,44 +1,37 @@
-import {expect, test} from "@playwright/test"
-import {LoginPage} from "../pages/LoginPage";
+import {expect, test} from "../fixtures/Setup.js"
 import dotenv from 'dotenv';
+
 dotenv.config();
+const {OHRM_USERNAME, OHRM_PASSWORD} = process.env
 
-let loginPage, validUsername, validPassword;
-
-test.beforeEach("Initialization", async ({page}) => {
-    loginPage = new LoginPage(page, expect);
-    validUsername = process.env.OHRM_USERNAME;
-    validPassword = process.env.OHRM_PASSWORD;
-});
-
-test("Verify login page can be loaded", async () => {
+test("Verify login page can be loaded", async ({loginPage}) => {
     await loginPage.openLoginPage();
     await loginPage.verifyLoginPageElementsAreDisplaying();
 });
 
-test("Verify login with valid credentials", async ({page}) => {
+test("Verify login with valid credentials", async ({loginPage, dashboardPage}) => {
     await loginPage.openLoginPage();
-    await loginPage.loginWithCredentials(validUsername, validPassword);
-    await expect(page).toHaveURL(loginPage.getDashboardUrl());
+    await loginPage.loginWithCredentials(OHRM_USERNAME, OHRM_PASSWORD);
+    await expect(dashboardPage.page).toHaveURL(dashboardPage.getPageUrl("dashboardPageUrl"));
 });
 
-test("Verify error message when incorrect username provided", async ()=>{
+test("Verify error message when incorrect username provided", async ({loginPage}) => {
     await loginPage.openLoginPage();
-    await loginPage.loginWithCredentials("value", validPassword)
-    await loginPage.loginButton.click();
-    const errorAlert = loginPage.getErrorAlert();
-    await expect(errorAlert).toHaveText(loginPage.errorMessages.invalidCredentialsError);
-})
-
-test("Verify error message when incorrect password provided", async ()=>{
-    await loginPage.openLoginPage();
-    await loginPage.loginWithCredentials(validUsername, "value")
+    await loginPage.loginWithCredentials("value", OHRM_PASSWORD)
     await loginPage.loginButton.click();
     const errorAlert = loginPage.getErrorAlertLocator();
     await expect(errorAlert).toHaveText(loginPage.errorMessages.invalidCredentialsError);
 })
 
-test.only("Verify error message when credentials not provided", async ()=>{
+test("Verify error message when incorrect password provided", async ({loginPage}) => {
+    await loginPage.openLoginPage();
+    await loginPage.loginWithCredentials(OHRM_USERNAME, "value")
+    await loginPage.loginButton.click();
+    const errorAlert = loginPage.getErrorAlertLocator();
+    await expect(errorAlert).toHaveText(loginPage.errorMessages.invalidCredentialsError);
+})
+
+test("Verify error message when credentials not provided", async ({loginPage}) => {
     await loginPage.openLoginPage();
     await loginPage.loginButton.click();
     const errorAlert = loginPage.getRequiredErrorLocator();

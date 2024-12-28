@@ -1,8 +1,9 @@
 {
   "url": {
     "baseUrl": "https://opensource-demo.orangehrmlive.com/web/index.php",
-    "loginPage": "/auth/login",
-    "dashboardPage": "/dashboard/index"
+    "loginPageUrl": "/auth/login",
+    "dashboardPageUrl": "/dashboard/index",
+    "adminPageUrl": "/admin/viewSystemUsers"
   },
   "errorMessages": {
     "invalidCredentialsError": "Invalid credentials",
